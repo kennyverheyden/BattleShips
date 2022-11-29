@@ -47,7 +47,6 @@ public class Main {
 
 			switch(userChose) {
 			case 1:
-				System.out.println("case1");
 				break;
 			case 2:
 				exitProgram = true;

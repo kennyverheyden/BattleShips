@@ -47,6 +47,7 @@ public class Main {
 
 			switch(userChose) {
 			case 1:
+				game.initGame();
 				break;
 			case 2:
 				exitProgram = true;

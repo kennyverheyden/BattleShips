@@ -2,8 +2,10 @@ package battleships;
 
 public class Field {
 
-	private String[][]squareArr;
-	private String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
+	private static String[][]mSquareArr;
+	static String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
+
+
 	private int mSquareSize; // Define field size; defined by user input
 
 	public Field(int squareSize)
@@ -16,36 +18,17 @@ public class Field {
 		}
 
 		// Create field
-		squareArr = new String[squareSize][squareSize];
+		mSquareArr = new String[squareSize][squareSize];
 		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<squareArr.length;i++)
+		for(int i=0;i<mSquareArr.length;i++)
 		{
-			for(int j=0;j<squareArr.length;j++)
+			for(int j=0;j<mSquareArr.length;j++)
 			{
 				sb.append(mLettersArr[i]+""+(j+1));
-				squareArr[i][j]=sb.toString();
+				mSquareArr[i][j]=sb.toString();
 				sb.setLength(0);
 			}
 		}
-	}
-
-	// Print the square (ocean) to the screen
-	public void printSquare()
-	{
-		for (int i = 0; i < squareArr.length; i++) {
-
-			printFieldLineDivider();
-			System.out.println("");
-			for (int j = 0; j < mSquareSize; j++) {
-				if(j==0)				{
-					System.out.print(" | ");
-				}
-				System.out.print(squareArr[i][j]+" | ");
-			}
-			System.out.println("");
-		}
-		this.printFieldLineDivider();
-		System.out.println(" ");
 	}
 
 	// Print line for formatting
@@ -64,12 +47,31 @@ public class Field {
 
 	}
 
+	// Print the square (ocean) to the screen
+	public void printSquare()
+	{
+		for (int i = 0; i < mSquareArr.length; i++) {
 
+			printFieldLineDivider();
+			System.out.println("");
+			for (int j = 0; j < mSquareSize; j++) {
+				if(j==0)				{
+					System.out.print(" | ");
+				}
+				System.out.print(mSquareArr[i][j]+" | ");
+			}
+			System.out.println("");
+		}
+		this.printFieldLineDivider();
+		System.out.println(" ");
+	}
 
+	public static String[] getmLettersArr() {
+		return mLettersArr;
+	}
 
-
-
-
-
+	public static String[][] getmSquareArr() {
+		return mSquareArr;
+	}
 
 }

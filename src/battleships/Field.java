@@ -2,8 +2,9 @@ package battleships;
 
 public class Field {
 
-	private static String[][]mSquareArr;
-	static String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
+	private String[][]mSquareArr;
+
+	private String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
 
 
 	private int mSquareSize; // Define field size; defined by user input
@@ -66,12 +67,17 @@ public class Field {
 		System.out.println(" ");
 	}
 
-	public static String[] getmLettersArr() {
+	public String[] getmLettersArr() {
 		return mLettersArr;
 	}
 
-	public static String[][] getmSquareArr() {
+	public String[][] getmSquareArr() {
 		return mSquareArr;
 	}
+	
+	public void setmSquareArr(String[][] mSquareArr) {
+		this.mSquareArr = mSquareArr;
+	}
+
 
 }

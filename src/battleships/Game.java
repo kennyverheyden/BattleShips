@@ -1,4 +1,5 @@
 package battleships;
+import java.util.Random;
 import java.util.Scanner;
 import battleships.Field;
 
@@ -28,44 +29,110 @@ public class Game {
 		setPlayerStartCoordinates(square,human);
 	}
 
+	public String computerChoseCoordinate(Field square, Player player)
+	{
+		boolean duplicateField = false;
+		StringBuilder sb = new StringBuilder();
+		Random rn = new Random();
+		String computerChoice;
+		int randomX;
+		int randomY;
+		do
+		{
+			randomX=rn.nextInt(square.getmSquareArr().length);
+			randomY=(rn.nextInt(square.getmSquareArr().length))+1;
+			sb.append(square.getmLettersArr()[randomX]);
+			sb.append(randomY);
+			computerChoice=sb.toString();
+			sb.setLength(0);
+
+
+			int i=0;
+			while(i<player.getmCoordinates().length)
+			{
+				if(player.getmCoordinates()[i].equals(computerChoice))
+				{
+
+					System.out.println("Computer chosed duplicate");
+					duplicateField=true;
+					break;
+				}
+				else
+				{
+					duplicateField=false;
+				}
+				i++;
+			}
+
+
+		}
+		while(duplicateField);
+		return computerChoice;
+	}
+
 	public void setPlayerStartCoordinates(Field square, Player player)
 	{
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			String shipCoordinate;
 			shipCoordinate=scanPlayerShipCoordinate(square, player);
-			String direction="null";
-			int number = (Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
-			if(number<10) {
-				direction =String.valueOf(shipCoordinate.charAt(2)); // get direction
-			}else {
-				direction =String.valueOf(shipCoordinate.charAt(3));
-			}
-			
-			
-			
-			
-			if(direction.equals("h"))
-			{
-				
-			}
-			else
-			{
-			
-			}
 
+			i=setCoordinate(square,player,shipCoordinate,i);
 
-
-
-
-			player.setmCoordinates(shipCoordinate,i);
 		}
+
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			System.out.println(player.getmCoordinates(i));
 		}
 	}
 
+
+	public int setCoordinate(Field square,Player player,String shipCoordinate, int i)
+	{
+		String direction="null";
+		int coordinateNumber=0;
+		int number=Integer.parseInt(shipCoordinate.replaceAll("[^0-9]", "")); 
+		if(number<10) {
+			direction =String.valueOf(shipCoordinate.charAt(2)); // get direction
+			coordinateNumber=Integer.parseInt(String.valueOf(shipCoordinate.charAt(1)));
+		}else {
+			direction =String.valueOf(shipCoordinate.charAt(3));
+			coordinateNumber=Integer.parseInt(String.valueOf(shipCoordinate.charAt(1))+String.valueOf(shipCoordinate.charAt(2)));
+		}
+		String letter =String.valueOf(shipCoordinate.charAt(0)); 
+
+		if(direction.equals("h"))
+		{	
+			for(int j=0;j<3;j++)
+			{
+				player.setmCoordinates(letter+coordinateNumber+direction, i);
+				coordinateNumber++;
+				i++;
+			}
+			i--;
+		}
+		else
+		{
+			int letterPosition=0;
+			while(letterPosition<square.getmLettersArr().length)
+			{
+				if(square.getmLettersArr()[letterPosition].equals(letter))
+				{		
+					break;	
+				}
+				letterPosition++;
+			}
+			for(int j=0;j<3;j++)
+			{
+				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i);
+				i++;
+				letterPosition++;
+			}
+			i--;
+		}
+		return i;
+	}
 
 	public boolean checkDuplicate(Player player, String shipcoordinate)
 	{
@@ -101,13 +168,11 @@ public class Game {
 			direction =String.valueOf(shipCoordinate.charAt(3));
 		}
 
-
 		for (int i = 0; i < square.getmSquareArr().length; i++) {
 			for (int j = 0; j < square.getmSquareArr().length; j++)
 			{
 
 			}
-
 		}
 	}
 
@@ -182,13 +247,10 @@ public class Game {
 
 		if(direction.equals("h") || direction.equals("v")) // Valid input of direction of ship
 		{
-
 			while(i<square.getmSquareArr().length-directionVertical)
 			{
 				if(lettersArr[i].equals(letter))
 				{
-
-
 					if(number <= (square.getmSquareArr().length-directionHorizontal))
 					{
 						check=true;

@@ -38,6 +38,11 @@ public class Field {
 		System.out.print(" ");
 		for (int i=0;i<mSquareSize;i++)
 		{
+			if(i==0)
+			{
+				System.out.print("    ");
+			}
+		
 			if(i<9) {
 				System.out.print("-----");
 			}
@@ -51,33 +56,45 @@ public class Field {
 	// Print the square (ocean) to the screen
 	public void printSquare()
 	{
-		for (int i = 0; i < mSquareArr.length; i++) {
-
-			printFieldLineDivider();
-			System.out.println("");
-			for (int j = 0; j < mSquareSize; j++) {
-				if(j==0)				{
-					System.out.print(" | ");
-				}
-				System.out.print(mSquareArr[i][j]+" | ");
+		for (int number = 0; number < mSquareSize; number++)
+		{
+			if(number==0)				{
+				System.out.print("      ");
 			}
-			System.out.println("");
+				System.out.print(" ");
+				System.out.print(" "+(number+1)+"  ");
 		}
-		this.printFieldLineDivider();
-		System.out.println(" ");
-	}
 
-	public String[] getmLettersArr() {
-		return mLettersArr;
-	}
+			System.out.println();
+			for (int i = 0; i < mSquareArr.length; i++) {
 
-	public String[][] getmSquareArr() {
-		return mSquareArr;
-	}
-	
-	public void setmSquareArr(String[][] mSquareArr) {
-		this.mSquareArr = mSquareArr;
-	}
+				printFieldLineDivider();
+				System.out.println("");
+				for (int j = 0; j < mSquareSize; j++) {
+					if(j==0)				{
+						System.out.print("   ");
+					}
+					if(j==0)
+					{
+						System.out.print(this.getmLettersArr()[i]+" | ");
+					}
+					System.out.print(mSquareArr[i][j]+" | ");
+				}
+				System.out.println("");
+			}
+			this.printFieldLineDivider();
+			System.out.println(" ");
+		}
 
+		public String[] getmLettersArr() {
+			return mLettersArr;
+		}
 
-}
+		public String[][] getmSquareArr() {
+			return mSquareArr;
+		}
+
+		public void setmSquareArr(String[][] mSquareArr) {
+			this.mSquareArr = mSquareArr;
+		}
+	}

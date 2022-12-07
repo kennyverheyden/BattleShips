@@ -14,59 +14,68 @@ public class Game {
 	public Game()
 	{
 		mMaxSquareSize=15; // MAX SET = 25 due alphabet array coordinates
-		mMinSquareSize=8;
-		mPointsPlayer=5;
-		mPointsComputer=5;
+		mMinSquareSize=4;
 		mMaxShips=4;
+		mPointsPlayer=mMaxShips;
+		mPointsComputer=mMaxShips;
 	}
 
 	public void initGame()
 	{
 		Field square = new Field(scanPlayerInputSquareSize(mMaxSquareSize, mMinSquareSize)); // Initialization dynamic boardSquare
-		Player human = new Player(mMaxShips,mPointsPlayer);
-		Player computer = new Player(mMaxShips,mPointsPlayer);
+		Player human = new Player(mMaxShips,mPointsPlayer,"human");
+		Player computer = new Player(mMaxShips,mPointsPlayer,"computer");
 		square.printSquare();
 		setPlayerStartCoordinates(square,human);
+		setPlayerStartCoordinates(square,computer);
+		updateSquareStart(square, human, computer);
+		square.printSquare();
+		System.out.println("Ships left player: "+mPointsPlayer);
+		System.out.println("Ships left computer: "+mPointsComputer);
+		System.out.println("");
 	}
 
 	public String computerChoseCoordinate(Field square, Player player)
 	{
-		boolean duplicateField = false;
 		StringBuilder sb = new StringBuilder();
 		Random rn = new Random();
-		String computerChoice;
+		String computerChoice=null;;
+		String[] directions= {"h","v"};
+		boolean validChose=false;
 		int randomX;
 		int randomY;
-		do
+		int randomD;
+
+		while(!validChose)
 		{
-			randomX=rn.nextInt(square.getmSquareArr().length);
-			randomY=(rn.nextInt(square.getmSquareArr().length))+1;
-			sb.append(square.getmLettersArr()[randomX]);
-			sb.append(randomY);
-			computerChoice=sb.toString();
-			sb.setLength(0);
-
-
-			int i=0;
-			while(i<player.getmCoordinates().length)
+			do
 			{
-				if(player.getmCoordinates()[i].equals(computerChoice))
-				{
+				randomX=rn.nextInt(square.getmSquareArr().length);
+				randomY=(rn.nextInt(square.getmSquareArr().length))+1;
+				randomD=(rn.nextInt(directions.length));
+				sb.append(square.getmLettersArr()[randomX]);
+				sb.append(randomY);
+				sb.append(directions[randomD]);
+				computerChoice=sb.toString();
+				sb.setLength(0);
 
-					System.out.println("Computer chosed duplicate");
-					duplicateField=true;
-					break;
-				}
-				else
+				int i=0;
+				if(i!=0)
 				{
-					duplicateField=false;
+					while(i<player.getmCoordinates().length)
+					{
+						if(player.getmCoordinates()[i].equals(computerChoice))
+						{
+							System.out.println("Computer chosed duplicate");
+							break;
+						}
+						i++;
+					}
 				}
-				i++;
 			}
-
-
+			while(checkDuplicate(player, computerChoice));
+			validChose=validateCoordinate(square,computerChoice);
 		}
-		while(duplicateField);
 		return computerChoice;
 	}
 
@@ -75,16 +84,18 @@ public class Game {
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			String shipCoordinate;
-			shipCoordinate=scanPlayerShipCoordinate(square, player);
-
+			if(player.getmIdName().equals("human"))
+			{
+				shipCoordinate=scanPlayerShipCoordinate(square, player);
+			}
+			else
+			{
+				shipCoordinate=computerChoseCoordinate(square, player);
+			}
 			i=setCoordinate(square,player,shipCoordinate,i);
 
 		}
 
-		for(int i=0;i<player.getmCoordinates().length;i++)
-		{
-			System.out.println(player.getmCoordinates(i));
-		}
 	}
 
 
@@ -104,16 +115,16 @@ public class Game {
 
 		if(direction.equals("h"))
 		{	
+			// we need to split up the String, to mark the other fields horizontal with dynamic number coordinate
 			for(int j=0;j<3;j++)
 			{
-				player.setmCoordinates(letter+coordinateNumber+direction, i);
+				player.setmCoordinates(letter+coordinateNumber+direction, i, j);
 				coordinateNumber++;
-				i++;
 			}
-			i--;
 		}
 		else
 		{
+			// we need to split up the String, to mark the other fields vertical with dynamic letter coordinate
 			int letterPosition=0;
 			while(letterPosition<square.getmLettersArr().length)
 			{
@@ -125,55 +136,139 @@ public class Game {
 			}
 			for(int j=0;j<3;j++)
 			{
-				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i);
-				i++;
+				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i, j);
 				letterPosition++;
 			}
-			i--;
 		}
 		return i;
 	}
 
-	public boolean checkDuplicate(Player player, String shipcoordinate)
+	public boolean checkDuplicate(Player player, String shipCoordinate)
 	{
 		boolean duplicate=false;
 		int i=0;
+		int j=0;
+		
 		while(i<player.getmCoordinates().length)
 		{
-			if(shipcoordinate.equals(player.getmCoordinates(i)))
-			{
-				duplicate=true;
-				break;
-			}
-			else
-			{
-				duplicate=false;
+			while (j<3) {
+				System.out.println("shipcor: "+ shipCoordinate);
+				System.out.println("arr "+ player.getmCoordinates()[i][j]);
+				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
+				{
+					return duplicate=true;
+				}
+				else
+				{
+					duplicate=false;
+				}
+				j++;
 			}
 			i++;
 		}
 		return duplicate;
 	}
 
-	public void updateSquare(Field square, String shipCoordinate)
+	public void updateSquareStart(Field square, Player human, Player computer)
 	{
-		String letter = String.valueOf(shipCoordinate.charAt(0)); // get letter coordinate
-		String direction;
-		int directionVertical=0; // dynamic, preserve place (fields) for ship more than one field
-		int directionHorizontal=0; // dynamic
-		int number;
-		number=(Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
-		if(number<10) {
-			direction =String.valueOf(shipCoordinate.charAt(2)); // get direction
-		}else {
-			direction =String.valueOf(shipCoordinate.charAt(3));
-		}
 
-		for (int i = 0; i < square.getmSquareArr().length; i++) {
-			for (int j = 0; j < square.getmSquareArr().length; j++)
+		String coordinateHuman;
+		String coordinateComputer;
+
+		for (int i = 0; i < human.getmCoordinates().length; i++) {
+			for (int j = 0; j < 3; j++)
 			{
+				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++)
+				{
+					for(int computerJ=0;computerJ<3;computerJ++)
+					{
+						if(computer.getmCoordinates()[computerI][computerJ].equals(human.getmCoordinates()[i][j]))
+						{
+							for (int x = 0; x < 3; x++)
+							{
+								coordinateHuman=human.getmCoordinates()[i][x].substring(0, human.getmCoordinates()[i][x].length()-1);
+								coordinateComputer=computer.getmCoordinates()[computerJ][x].substring(0, computer.getmCoordinates()[computerJ][x].length()-1);
+
+								for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+									for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+									{
+										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
+										{
+
+											if(jSquare<10)
+											{
+												square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting
+											}
+											else
+											{
+												square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
+											}
+											if(x==2)
+											{
+												this.setmPointsComputerMin();
+												this.setmPointsPlayerMin();
+											}
+										}
+									}
+
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+
+	public boolean updateSquare(Field square, Player player, String shipCoordinate)
+	{
+		String fieldCoordinate;
+		boolean hit=false;
+		String mark;
+		if(player.getmIdName().equals("human"))
+		{
+			mark="y";
+		}
+		else
+		{
+			mark="c";
+		}
+		for (int i = 0; i < player.getmCoordinates().length; i++) {
+			for (int j = 0; j < 3; j++)
+			{
+				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
+				{
+					for (int x = 0; x < 3; x++)
+					{
+						fieldCoordinate=player.getmCoordinates()[i][x].substring(0, shipCoordinate.length()-1);
+						for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+							for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+							{
+								if(fieldCoordinate.equals(square.getmSquareArr()[iSquare][jSquare]))
+								{
+									if(jSquare<10)
+									{
+										square.getmSquareArr()[iSquare][jSquare]=mark+"@";
+									}
+									else
+									{
+										square.getmSquareArr()[iSquare][jSquare]=mark+"@@";
+									}
+									hit=true;
+								}
+							}
+						}
+					}
+				}
 
 			}
 		}
+		return hit;
+
+
 	}
 
 	//Ask player ship coordinates
@@ -186,7 +281,7 @@ public class Game {
 		boolean validInput=false;
 
 		do {
-			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" H=horizontal/V=vertical e.g. [A1V]:");
+			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" h=horizontal/v=vertical e.g. [a1v]:");
 			try
 			{
 				shipCoordinate=input.nextLine().toLowerCase().toString();
@@ -303,6 +398,19 @@ public class Game {
 		}
 		while(invalid); // The loop ends when the input is valid
 		return squareSize;
+	}
+
+
+
+
+
+	public void setmPointsComputerMin() {
+		this.mPointsComputer--;
+	}
+
+
+	public void setmPointsPlayerMin() {
+		this.mPointsPlayer--;
 	}
 
 }

@@ -1,4 +1,5 @@
 package battleships;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 import battleships.Field;
@@ -146,26 +147,18 @@ public class Game {
 	public boolean checkDuplicate(Player player, String shipCoordinate)
 	{
 		boolean duplicate=false;
-		int i=0;
-		int j=0;
-		
-		while(i<player.getmCoordinates().length)
+
+		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
-			while (j<3) {
-				System.out.println("shipcor: "+ shipCoordinate);
-				System.out.println("arr "+ player.getmCoordinates()[i][j]);
+			for(int j=0;j<3;j++)
+			{
 				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
-				{
-					return duplicate=true;
-				}
-				else
-				{
-					duplicate=false;
-				}
-				j++;
+						{
+					duplicate=true;
+						}
 			}
-			i++;
 		}
+
 		return duplicate;
 	}
 
@@ -175,18 +168,18 @@ public class Game {
 		String coordinateHuman;
 		String coordinateComputer;
 
-		for (int i = 0; i < human.getmCoordinates().length; i++) {
-			for (int j = 0; j < 3; j++)
+		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
+			for (int humanJ = 0; humanJ < 3; humanJ++)
 			{
 				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++)
 				{
 					for(int computerJ=0;computerJ<3;computerJ++)
 					{
-						if(computer.getmCoordinates()[computerI][computerJ].equals(human.getmCoordinates()[i][j]))
+						if(computer.getmCoordinates()[computerI][computerJ].equals(human.getmCoordinates()[humanI][humanJ]))
 						{
 							for (int x = 0; x < 3; x++)
 							{
-								coordinateHuman=human.getmCoordinates()[i][x].substring(0, human.getmCoordinates()[i][x].length()-1);
+								coordinateHuman=human.getmCoordinates()[humanI][x].substring(0, human.getmCoordinates()[humanI][x].length()-1);
 								coordinateComputer=computer.getmCoordinates()[computerJ][x].substring(0, computer.getmCoordinates()[computerJ][x].length()-1);
 
 								for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
@@ -194,7 +187,6 @@ public class Game {
 									{
 										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 										{
-
 											if(jSquare<10)
 											{
 												square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting

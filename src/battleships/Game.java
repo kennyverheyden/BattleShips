@@ -15,7 +15,7 @@ public class Game {
 	public Game()
 	{
 		mMaxSquareSize=15; // MAX SET = 25 due alphabet array coordinates
-		mMinSquareSize=4;
+		mMinSquareSize=7;
 		mMaxShips=4;
 		mPointsPlayer=mMaxShips;
 		mPointsComputer=mMaxShips;
@@ -33,9 +33,18 @@ public class Game {
 		square.printSquare();
 		System.out.println("Ships left player: "+mPointsPlayer);
 		System.out.println("Ships left computer: "+mPointsComputer);
+
+		System.out.println("Player: "+ Arrays.deepToString(human.getmCoordinates()));
+		System.out.println("Human: "+ Arrays.deepToString(computer.getmCoordinates()));
+
+		shoot(square,computer,scanPlayerShootCoordinate(square, computer));
+		square.printSquare();
+
 		System.out.println("");
+
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	public String computerChoseCoordinate(Field square, Player player)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -61,14 +70,22 @@ public class Game {
 				sb.setLength(0);
 
 				int i=0;
-				if(i!=0)
+				if(player.getmCoordinates()[0][0]!=null)
 				{
 					while(i<player.getmCoordinates().length)
 					{
-						if(player.getmCoordinates()[i].equals(computerChoice))
+						int j=0;
+						while(j<3)
 						{
-							System.out.println("Computer chosed duplicate");
-							break;
+							if(player.getmCoordinates()[i][j]!=null)
+							{
+								if(player.getmCoordinates()[i][j].equals(computerChoice))
+								{
+									System.out.println("Computer chosed duplicate");
+									return computerChoice;
+								}
+							}
+							j++;
 						}
 						i++;
 					}
@@ -153,9 +170,9 @@ public class Game {
 			for(int j=0;j<3;j++)
 			{
 				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
-						{
+				{
 					duplicate=true;
-						}
+				}
 			}
 		}
 
@@ -175,7 +192,11 @@ public class Game {
 				{
 					for(int computerJ=0;computerJ<3;computerJ++)
 					{
-						if(computer.getmCoordinates()[computerI][computerJ].equals(human.getmCoordinates()[humanI][humanJ]))
+
+						coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
+						coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
+
+						if(coordinateHuman.equals(coordinateComputer))
 						{
 							for (int x = 0; x < 3; x++)
 							{
@@ -195,14 +216,15 @@ public class Game {
 											{
 												square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
 											}
-											if(x==2)
-											{
-												this.setmPointsComputerMin();
-												this.setmPointsPlayerMin();
-											}
+
 										}
 									}
 
+								}
+								if(x==2)
+								{
+									this.setmPointsComputerMin();
+									this.setmPointsPlayerMin();
 								}
 							}
 						}
@@ -215,52 +237,55 @@ public class Game {
 
 
 
-	public boolean updateSquare(Field square, Player player, String shipCoordinate)
+	public boolean shoot(Field square, Player player, String shipCoordinate)
 	{
-		String fieldCoordinate;
-		boolean hit=false;
-		String mark;
-		if(player.getmIdName().equals("human"))
+		String coordinate;
+		String fieldCoordinate = shipCoordinate.substring(0, shipCoordinate.length()-1);
+		String listedField; // temp storage from player coordinates array
+		boolean hit = false;
+		System.out.println("fieldCoordinate: "+ fieldCoordinate);
+		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
-			mark="y";
-		}
-		else
-		{
-			mark="c";
-		}
-		for (int i = 0; i < player.getmCoordinates().length; i++) {
-			for (int j = 0; j < 3; j++)
-			{
-				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
-				{
-					for (int x = 0; x < 3; x++)
+			for (int j = 0; j < 3; j++) {
+				coordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
+				System.out.println("coordinate: "+ coordinate);
+				if(coordinate.equals(fieldCoordinate)) {
+
+					for(int x=0;x<3;x++)
 					{
-						fieldCoordinate=player.getmCoordinates()[i][x].substring(0, shipCoordinate.length()-1);
+
+						listedField=player.getmCoordinates()[i][x].substring(0, player.getmCoordinates()[i][x].length()-1);
+						
 						for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
 							for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
 							{
-								if(fieldCoordinate.equals(square.getmSquareArr()[iSquare][jSquare]))
+								if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
 								{
 									if(jSquare<10)
 									{
-										square.getmSquareArr()[iSquare][jSquare]=mark+"@";
+										square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting
 									}
 									else
 									{
-										square.getmSquareArr()[iSquare][jSquare]=mark+"@@";
+										square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
 									}
 									hit=true;
+
 								}
 							}
+
 						}
+
+
+
 					}
+
+
 				}
 
 			}
 		}
 		return hit;
-
-
 	}
 
 	//Ask player ship coordinates
@@ -305,6 +330,38 @@ public class Game {
 		return shipCoordinate;
 	}
 
+	//Ask player ship coordinates
+	public String scanPlayerShootCoordinate(Field square, Player targetPlayer)
+	{
+		Scanner input = new Scanner(System.in);
+		String shipCoordinate=null;;
+		String shipDirection = null;
+		String[] letterArr = square.getmLettersArr();
+		boolean validInput=false;
+
+		do {
+			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" h=horizontal/v=vertical e.g. [a1v]:");
+			try
+			{
+				shipCoordinate=input.nextLine().toLowerCase().toString();
+				validInput=true;
+				if(validateCoordinate(square, shipCoordinate))
+				{
+						return shipCoordinate;
+				}
+				else
+				{
+					System.out.println("Coordinate out of range");
+					validInput=false;
+				}
+			}
+			catch(Exception e){
+				System.out.println("Enter valid coordinate\n");
+				validInput=false;
+			}
+		}while(!validInput);
+		return shipCoordinate;
+	}
 
 	public boolean validateCoordinate(Field square, String input)
 	{	

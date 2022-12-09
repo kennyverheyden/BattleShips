@@ -26,27 +26,27 @@ public class Game {
 		square.printSquare();
 		setPlayerStartCoordinates(square,human);
 		setPlayerStartCoordinates(square,computer);
+		System.out.println("Human: "+ Arrays.deepToString(human.getmCoordinates()));
+		System.out.println("Computer: "+ Arrays.deepToString(computer.getmCoordinates()));
 		updateSquareStart(square, human, computer);
 		square.printSquare();
 		System.out.println("Ships left player: "+human.getmPoints());
 		System.out.println("Ships left computer: "+computer.getmPoints());
-
-		System.out.println("Human: "+ Arrays.deepToString(human.getmCoordinates()));
-		System.out.println("Computer: "+ Arrays.deepToString(computer.getmCoordinates()));
 		play(square, human, computer);
 		System.out.println("");
-
 	}
 
-	private void play(Field square, Player human, Player computer) {
-		
+	public void play(Field square, Player human, Player computer) {
+
 		while(human.getmPoints()>0 && computer.getmPoints()>0)
 		{
-		shoot(square,computer,scanPlayerShootCoordinate(square, computer));
-		shoot(square,human,computerShoot(square));
-		square.printSquare();
+			shoot(square,computer,scanPlayerShootCoordinate(square, computer));
+			shoot(square,human,computerShoot(square));
+			square.printSquare();
+			System.out.println("Your ships left: "+ human.getmPoints());
+			System.out.println("Computer ships left: "+computer.getmPoints());
 		}
-		
+
 		if(human.getmPoints()>0)
 		{
 			System.out.println("You destroyed all the ships in the ocean");
@@ -55,8 +55,6 @@ public class Game {
 		{
 			System.out.println("You losed all your ships");
 		}
-		System.out.println("Ships player: "+human.getmPoints());
-		System.out.println("Ships computer: "+computer.getmPoints());
 	}
 
 	public String computerChoseCoordinate(Field square, Player player)
@@ -66,6 +64,7 @@ public class Game {
 		String computerChoice=null;;
 		String[] directions= {"h","v"};
 		boolean validChose=false;
+		boolean duplicate=false;
 		int randomX;
 		int randomY;
 		int randomD;
@@ -82,30 +81,10 @@ public class Game {
 				sb.append(directions[randomD]);
 				computerChoice=sb.toString();
 				sb.setLength(0);
-
-				int i=0;
-				if(player.getmCoordinates()[0][0]!=null)
-				{
-					while(i<player.getmCoordinates().length)
-					{
-						int j=0;
-						while(j<3)
-						{
-							if(player.getmCoordinates()[i][j]!=null)
-							{
-								if(player.getmCoordinates()[i][j].equals(computerChoice))
-								{
-									System.out.println("Computer chosed duplicate");
-									return computerChoice;
-								}
-							}
-							j++;
-						}
-						i++;
-					}
-				}
+				duplicate=checkDuplicate(player, computerChoice);
 			}
-			while(checkDuplicate(player, computerChoice));
+			while(duplicate);
+
 			validChose=validateCoordinate(square,computerChoice);
 		}
 		return computerChoice;
@@ -194,7 +173,6 @@ public class Game {
 				}
 			}
 		}
-
 		return duplicate;
 	}
 
@@ -216,16 +194,15 @@ public class Game {
 						// ships on same field (collision)
 						if(coordinateHuman.equals(coordinateComputer))
 						{
-							// substract points by collision
-							human.setmPoints();
-							computer.setmPoints();
-
 							//now read the occupied fields of this ship from the player coordinate list
 							for (int x = 0; x < 3; x++) // read from the first field x of the ship
 							{
 								// get coordinate without h or v in the string for compairing in field square
 								coordinateHuman=human.getmCoordinates()[humanI][x].substring(0, human.getmCoordinates()[humanI][x].length()-1);
 								coordinateComputer=computer.getmCoordinates()[computerI][x].substring(0, computer.getmCoordinates()[computerI][x].length()-1);
+
+								human.getmCoordinates()[humanI][x]="@";
+								computer.getmCoordinates()[computerI][x]="@";
 
 								// mark on field, the listed coordinates from this ship
 								for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
@@ -245,11 +222,41 @@ public class Game {
 											}
 										}
 									}
-
 								}
-
 							}
 						}
+					}
+				}
+			}
+		}
+
+		// count hitted fields human
+		for(int i=0; i<human.getmCoordinates().length;i++)
+		{
+			int count=0;
+			for (int j=0; j<3; j++) {
+				if(human.getmCoordinates()[i][j].equals("@"))
+				{
+					count++;
+					if(count==3)
+					{
+						human.setmPoints();
+					}
+				}
+			}
+		}
+		// count hitted fields computer
+		for(int i=0; i<computer.getmCoordinates().length;i++)
+		{
+			int count=0;
+			for (int j=0; j<3; j++) {
+				if(human.getmCoordinates()[i][j].equals("@"))
+				{
+					count++;
+					if(count==3)
+					{
+
+						computer.setmPoints();
 					}
 				}
 			}
@@ -259,19 +266,20 @@ public class Game {
 	public void shoot(Field square, Player player, String shipCoordinate)
 	{
 		String coordinate;
-		String fieldCoordinate = shipCoordinate.substring(0, shipCoordinate.length()-1);
 		String listedField; // temp storage from player coordinates array
+		boolean hit=false;
 
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			for (int j = 0; j < 3; j++) {
 				coordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-				if(coordinate.equals(fieldCoordinate)) {
+				if(coordinate.equals(shipCoordinate)) {
+					hit=true;
 
 					for(int x=0;x<3;x++)
 					{
 						listedField=player.getmCoordinates()[i][x].substring(0, player.getmCoordinates()[i][x].length()-1);
-
+						player.getmCoordinates()[i][x]="@";
 						for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
 							for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
 							{
@@ -285,7 +293,6 @@ public class Game {
 									{
 										square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
 									}
-									player.setmPoints();
 								}
 							}
 						}
@@ -293,8 +300,30 @@ public class Game {
 				}
 			}
 		}
+		if(hit)
+		{
+			player.setmPoints();
+			if(!player.getmIdName().equals("computer"))
+			{
+				System.out.println("The computer toke one of your ships to sink");
+			}
+			else
+			{
+				System.out.println("You HIT a ship");
+			}
+		}
+		else
+		{
+			if(!player.getmIdName().equals("computer"))
+			{
+				System.out.println("The computer missed");
+			}
+			else
+			{
+				System.out.println("You missed");
+			}
+		}
 	}
-	
 	public String computerShoot(Field field)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -316,7 +345,7 @@ public class Game {
 		boolean validInput=false;
 
 		do {
-			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" h=horizontal/v=vertical e.g. [a1v]:");
+			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" AND direction h=horizontal/v=vertical e.g. [A1h]:");
 			try
 			{
 				shipCoordinate=input.nextLine().toLowerCase().toString();
@@ -359,22 +388,40 @@ public class Game {
 		boolean validInput=false;
 
 		do {
-			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length+":");
+			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length+" without direction e.g. [A1]: ");
 			try
 			{
 				shipCoordinate=input.nextLine().toLowerCase().toString();
 				String letter = String.valueOf(shipCoordinate.charAt(0)); 
 				int number=(Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
-
 				for(int i=0;i<square.getmSquareArr().length;i++)
 				{
-
 					if(letterArr[i].equals(letter))
 					{
 						if(number<=square.getmSquareArr().length)
 						{
-							validInput=true;
-
+							if(square.getmLettersArr().length>9)
+							{
+								if(shipCoordinate.length()>2)
+								{
+									System.out.println("Invalid input, please enter only coordinate e.g A1");
+								}
+								else
+								{
+									validInput=true;
+								}
+							}
+							else
+							{
+								if(shipCoordinate.length()>3)
+								{
+									System.out.println("Invalid input, please enter only coordinate e.g A1");
+								}
+								else
+								{
+									validInput=true;
+								}
+							}
 						}
 						else
 						{

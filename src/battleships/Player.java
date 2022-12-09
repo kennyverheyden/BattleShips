@@ -6,10 +6,10 @@ public class Player {
 	private String mIdName;
 	private int mPoints;
 
-	public Player(int max, String idName)
+	public Player(int maxShips, String idName)
 	{
-		mCoordinates=new String[max][3]; // 3 each ship takes 3 fields
-		mPoints=max;
+		mCoordinates=new String[maxShips][3]; // 3 each ship takes 3 fields
+		mPoints=maxShips;
 		mIdName=idName;
 	}
 	
@@ -37,5 +37,5 @@ public class Player {
 	public void setmPoints() {
 		this.mPoints--;
 	}
-
+	
 }

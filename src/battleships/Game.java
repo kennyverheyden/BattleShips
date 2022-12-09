@@ -9,7 +9,6 @@ public class Game {
 	int mMaxSquareSize;
 	int mMinSquareSize;
 	int mPointsPlayer;
-	int mPointsComputer;
 	int mMaxShips;
 
 	public Game()
@@ -17,34 +16,49 @@ public class Game {
 		mMaxSquareSize=15; // MAX SET = 25 due alphabet array coordinates
 		mMinSquareSize=7;
 		mMaxShips=4;
-		mPointsPlayer=mMaxShips;
-		mPointsComputer=mMaxShips;
 	}
 
 	public void initGame()
 	{
 		Field square = new Field(scanPlayerInputSquareSize(mMaxSquareSize, mMinSquareSize)); // Initialization dynamic boardSquare
-		Player human = new Player(mMaxShips,mPointsPlayer,"human");
-		Player computer = new Player(mMaxShips,mPointsPlayer,"computer");
+		Player human = new Player(mMaxShips,"human");
+		Player computer = new Player(mMaxShips,"computer");
 		square.printSquare();
 		setPlayerStartCoordinates(square,human);
 		setPlayerStartCoordinates(square,computer);
 		updateSquareStart(square, human, computer);
 		square.printSquare();
-		System.out.println("Ships left player: "+mPointsPlayer);
-		System.out.println("Ships left computer: "+mPointsComputer);
+		System.out.println("Ships left player: "+human.getmPoints());
+		System.out.println("Ships left computer: "+computer.getmPoints());
 
-		System.out.println("Player: "+ Arrays.deepToString(human.getmCoordinates()));
-		System.out.println("Human: "+ Arrays.deepToString(computer.getmCoordinates()));
-
-		shoot(square,computer,scanPlayerShootCoordinate(square, computer));
-		square.printSquare();
-
+		System.out.println("Human: "+ Arrays.deepToString(human.getmCoordinates()));
+		System.out.println("Computer: "+ Arrays.deepToString(computer.getmCoordinates()));
+		play(square, human, computer);
 		System.out.println("");
 
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
+	private void play(Field square, Player human, Player computer) {
+		
+		while(human.getmPoints()>0 && computer.getmPoints()>0)
+		{
+		shoot(square,computer,scanPlayerShootCoordinate(square, computer));
+		shoot(square,human,computerShoot(square));
+		square.printSquare();
+		}
+		
+		if(human.getmPoints()>0)
+		{
+			System.out.println("You destroyed all the ships in the ocean");
+		}
+		else
+		{
+			System.out.println("You losed all your ships");
+		}
+		System.out.println("Ships player: "+human.getmPoints());
+		System.out.println("Ships computer: "+computer.getmPoints());
+	}
+
 	public String computerChoseCoordinate(Field square, Player player)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -111,9 +125,7 @@ public class Game {
 				shipCoordinate=computerChoseCoordinate(square, player);
 			}
 			i=setCoordinate(square,player,shipCoordinate,i);
-
 		}
-
 	}
 
 
@@ -164,14 +176,21 @@ public class Game {
 	public boolean checkDuplicate(Player player, String shipCoordinate)
 	{
 		boolean duplicate=false;
+		String listedField;
+		String fieldCoordinate;
 
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			for(int j=0;j<3;j++)
 			{
-				if(shipCoordinate.equals(player.getmCoordinates()[i][j]))
+				if(player.getmCoordinates()[i][j]!=null) // avoid error on first input while coordinate list is empty
 				{
-					duplicate=true;
+					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
+					fieldCoordinate=shipCoordinate.substring(0, shipCoordinate.length()-1);
+					if(listedField.equals(fieldCoordinate))
+					{
+						duplicate=true;
+					}
 				}
 			}
 		}
@@ -181,34 +200,42 @@ public class Game {
 
 	public void updateSquareStart(Field square, Player human, Player computer)
 	{
-
-		String coordinateHuman;
+		String coordinateHuman; // for storing coordinate without the h or v in the string for processing
 		String coordinateComputer;
 
 		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
 			for (int humanJ = 0; humanJ < 3; humanJ++)
 			{
-				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++)
-				{
+				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++) {
 					for(int computerJ=0;computerJ<3;computerJ++)
 					{
-
+						//remove the h or the v from the coordinate for processing
 						coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
 						coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
 
+						// ships on same field (collision)
 						if(coordinateHuman.equals(coordinateComputer))
 						{
-							for (int x = 0; x < 3; x++)
-							{
-								coordinateHuman=human.getmCoordinates()[humanI][x].substring(0, human.getmCoordinates()[humanI][x].length()-1);
-								coordinateComputer=computer.getmCoordinates()[computerJ][x].substring(0, computer.getmCoordinates()[computerJ][x].length()-1);
+							// substract points by collision
+							human.setmPoints();
+							computer.setmPoints();
 
+							//now read the occupied fields of this ship from the player coordinate list
+							for (int x = 0; x < 3; x++) // read from the first field x of the ship
+							{
+								// get coordinate without h or v in the string for compairing in field square
+								coordinateHuman=human.getmCoordinates()[humanI][x].substring(0, human.getmCoordinates()[humanI][x].length()-1);
+								coordinateComputer=computer.getmCoordinates()[computerI][x].substring(0, computer.getmCoordinates()[computerI][x].length()-1);
+
+								// mark on field, the listed coordinates from this ship
 								for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
 									for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
 									{
+										// compaire with fields on the square
 										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 										{
-											if(jSquare<10)
+
+											if(jSquare<10) // preserved space for formatting
 											{
 												square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting
 											}
@@ -216,16 +243,11 @@ public class Game {
 											{
 												square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
 											}
-
 										}
 									}
 
 								}
-								if(x==2)
-								{
-									this.setmPointsComputerMin();
-									this.setmPointsPlayerMin();
-								}
+
 							}
 						}
 					}
@@ -234,28 +256,22 @@ public class Game {
 		}
 	}
 
-
-
-
-	public boolean shoot(Field square, Player player, String shipCoordinate)
+	public void shoot(Field square, Player player, String shipCoordinate)
 	{
 		String coordinate;
 		String fieldCoordinate = shipCoordinate.substring(0, shipCoordinate.length()-1);
 		String listedField; // temp storage from player coordinates array
-		boolean hit = false;
-		System.out.println("fieldCoordinate: "+ fieldCoordinate);
+
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			for (int j = 0; j < 3; j++) {
 				coordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-				System.out.println("coordinate: "+ coordinate);
 				if(coordinate.equals(fieldCoordinate)) {
 
 					for(int x=0;x<3;x++)
 					{
-
 						listedField=player.getmCoordinates()[i][x].substring(0, player.getmCoordinates()[i][x].length()-1);
-						
+
 						for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
 							for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
 							{
@@ -269,23 +285,25 @@ public class Game {
 									{
 										square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
 									}
-									hit=true;
-
+									player.setmPoints();
 								}
 							}
-
 						}
-
-
-
 					}
-
-
 				}
-
 			}
 		}
-		return hit;
+	}
+	
+	public String computerShoot(Field field)
+	{
+		StringBuilder sb = new StringBuilder();
+		Random rn = new Random();
+		int randomX=rn.nextInt(field.getmSquareArr().length);
+		sb.append(field.getmLettersArr()[randomX]);
+		sb.append(randomX);
+		String computerChoice=sb.toString();
+		return computerChoice;
 	}
 
 	//Ask player ship coordinates
@@ -337,22 +355,33 @@ public class Game {
 		String shipCoordinate=null;;
 		String shipDirection = null;
 		String[] letterArr = square.getmLettersArr();
+
 		boolean validInput=false;
 
 		do {
-			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" h=horizontal/v=vertical e.g. [a1v]:");
+			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length+":");
 			try
 			{
 				shipCoordinate=input.nextLine().toLowerCase().toString();
-				validInput=true;
-				if(validateCoordinate(square, shipCoordinate))
+				String letter = String.valueOf(shipCoordinate.charAt(0)); 
+				int number=(Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
+
+				for(int i=0;i<square.getmSquareArr().length;i++)
 				{
-						return shipCoordinate;
-				}
-				else
-				{
-					System.out.println("Coordinate out of range");
-					validInput=false;
+
+					if(letterArr[i].equals(letter))
+					{
+						if(number<=square.getmSquareArr().length)
+						{
+							validInput=true;
+
+						}
+						else
+						{
+							System.out.println("Coordinate out of range");
+							validInput=false;
+						}
+					}		
 				}
 			}
 			catch(Exception e){
@@ -447,19 +476,6 @@ public class Game {
 		}
 		while(invalid); // The loop ends when the input is valid
 		return squareSize;
-	}
-
-
-
-
-
-	public void setmPointsComputerMin() {
-		this.mPointsComputer--;
-	}
-
-
-	public void setmPointsPlayerMin() {
-		this.mPointsPlayer--;
 	}
 
 }

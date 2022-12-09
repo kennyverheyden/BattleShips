@@ -4,14 +4,12 @@ public class Player {
 
 	private String[][] mCoordinates;
 	private String mIdName;
-	private int mPlacedShipCount;
 	private int mPoints;
 
-	public Player(int max, int points,String idName)
+	public Player(int max, String idName)
 	{
 		mCoordinates=new String[max][3]; // 3 each ship takes 3 fields
-		mPoints=points;
-		mPlacedShipCount=0;
+		mPoints=max;
 		mIdName=idName;
 	}
 	
@@ -36,12 +34,8 @@ public class Player {
 		return mPoints;
 	}
 
-	public void setmPoints(int mPoints) {
-		this.mPoints = mPoints;
-	}
-
-	public int getmPlacedShipCount() {
-		return mPlacedShipCount;
+	public void setmPoints() {
+		this.mPoints--;
 	}
 
 }

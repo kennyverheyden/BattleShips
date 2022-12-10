@@ -71,11 +71,9 @@ public class Field {
 				printFieldLineDivider();
 				System.out.println("");
 				for (int j = 0; j < mSquareSize; j++) {
-					if(j==0)				{
-						System.out.print("   ");
-					}
 					if(j==0)
 					{
+						System.out.print("   ");
 						System.out.print(this.getmLettersArr()[i]+" | ");
 					}
 					System.out.print(mSquareArr[i][j]+" | ");

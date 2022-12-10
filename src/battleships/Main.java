@@ -10,15 +10,16 @@ public class Main {
 	public static void main(String[] args) {
 
 		welcome();
-		Content();
+		content();
+		endMSG();
 	}
 
-	public static void EndMSG()
+	public static void endMSG()
 	{
 		System.out.println("\n  Thank you for playing");
 	}
 
-	public static void Content()
+	public static void content()
 	{
 		Game game = new Game();
 		Scanner userInput = new Scanner(System.in);

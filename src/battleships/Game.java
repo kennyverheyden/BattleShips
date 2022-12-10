@@ -26,8 +26,6 @@ public class Game {
 		square.printSquare();
 		setPlayerStartCoordinates(square,human);
 		setPlayerStartCoordinates(square,computer);
-		System.out.println("Human: "+ Arrays.deepToString(human.getmCoordinates()));
-		System.out.println("Computer: "+ Arrays.deepToString(computer.getmCoordinates()));
 		updateSquareStart(square, human, computer);
 		square.printSquare();
 		System.out.println("Ships left player: "+human.getmPoints());

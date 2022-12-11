@@ -1,8 +1,7 @@
 package battleships;
-import java.util.Arrays;
+
 import java.util.Random;
 import java.util.Scanner;
-import battleships.Field;
 
 public class Game {
 
@@ -40,9 +39,9 @@ public class Game {
 		{
 			shoot(square,computer,scanPlayerShootCoordinate(square, computer));
 			shoot(square,human,computerShoot(square));
-			square.printSquare();
 			System.out.println("Your ships left: "+ human.getmPoints());
 			System.out.println("Computer ships left: "+computer.getmPoints());
+			square.printSquare();
 		}
 
 		if(human.getmPoints()>0)
@@ -176,23 +175,49 @@ public class Game {
 
 	public void updateSquareStart(Field square, Player human, Player computer)
 	{
-		String coordinateHuman; // for storing coordinate without the h or v in the string for processing
+		String coordinateHuman; // for storing coordinate without the h or v in the String for processing
 		String coordinateComputer;
 
+		// mark ships on field
+		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
+			for (int humanJ = 0; humanJ < 3; humanJ++)
+			{
+				coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
+				for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+					for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+					{
+						// compaire with fields on the square
+						if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman))
+						{
+							if(jSquare<10) // preserved space for formatting
+							{
+								square.getmSquareArr()[iSquare][jSquare]="<>"; // formatting
+							}
+							else
+							{
+								square.getmSquareArr()[iSquare][jSquare]=" <>"; // formatting
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// mark collisions on field
 		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
 			for (int humanJ = 0; humanJ < 3; humanJ++)
 			{
 				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++) {
 					for(int computerJ=0;computerJ<3;computerJ++)
 					{
-						//remove the h or the v from the coordinate for processing
+						// remove the h or the v from the coordinate for processing
 						coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
 						coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
 
 						// ships on same field (collision)
 						if(coordinateHuman.equals(coordinateComputer))
 						{
-							//now read the occupied fields of this ship from the player coordinate list
+							// now read the occupied fields of this ship from the player coordinate list
 							for (int x = 0; x < 3; x++) // read from the first field x of the ship
 							{
 								// get coordinate without h or v in the string for compairing in field square
@@ -209,14 +234,13 @@ public class Game {
 										// compaire with fields on the square
 										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 										{
-
 											if(jSquare<10) // preserved space for formatting
 											{
-												square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting
+												square.getmSquareArr()[iSquare][jSquare]=" @"; // formatting
 											}
 											else
 											{
-												square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
+												square.getmSquareArr()[iSquare][jSquare]="  @"; // formatting
 											}
 										}
 									}
@@ -253,7 +277,6 @@ public class Game {
 					count++;
 					if(count==3)
 					{
-
 						computer.setmPoints();
 					}
 				}
@@ -283,13 +306,13 @@ public class Game {
 							{
 								if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
 								{
-									if(jSquare<10)
+									if(jSquare<=10)
 									{
-										square.getmSquareArr()[iSquare][jSquare]="@@"; // formatting
+										square.getmSquareArr()[iSquare][jSquare]=" @"; // formatting
 									}
 									else
 									{
-										square.getmSquareArr()[iSquare][jSquare]="@@@"; // formatting
+										square.getmSquareArr()[iSquare][jSquare]="  @"; // formatting
 									}
 								}
 							}
@@ -297,13 +320,14 @@ public class Game {
 					}
 				}
 			}
-		}
+		}	
+
 		if(hit)
 		{
 			player.setmPoints();
 			if(!player.getmIdName().equals("computer"))
 			{
-				System.out.println("The computer toke one of your ships to sink");
+				System.out.println("The computer took one of your ships to sink");
 			}
 			else
 			{
@@ -320,20 +344,63 @@ public class Game {
 			{
 				System.out.println("You missed");
 			}
+			if(!hit)
+			{
+				for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+					for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+					{
+						if(square.getmSquareArr()[iSquare][jSquare].equals(shipCoordinate))
+						{
+							if(jSquare<=10)
+							{
+								square.getmSquareArr()[iSquare][jSquare]=" +"; // formatting
+							}
+							else
+							{
+								square.getmSquareArr()[iSquare][jSquare]="  +"; // formatting
+							}
+						}
+					}
+				}
+			}
 		}
+
 	}
 	public String computerShoot(Field field)
 	{
+		boolean ChoosedOnField=false;
 		StringBuilder sb = new StringBuilder();
-		Random rn = new Random();
-		int randomX=rn.nextInt(field.getmSquareArr().length);
-		sb.append(field.getmLettersArr()[randomX]);
-		sb.append(randomX);
-		String computerChoice=sb.toString();
+		String computerChoice=null;
+		do
+		{
+			Random rn = new Random();
+			int randomX=rn.nextInt(field.getmSquareArr().length);
+			sb.append(field.getmLettersArr()[randomX]);
+			sb.append(randomX);
+			computerChoice=sb.toString();
+			// check if the field is already chosen or not
+			for(int i=0;i<field.getmSquareArr().length;i++)
+			{
+				for(int j=0;j<field.getmSquareArr().length;j++)
+				{
+					if(field.getmLettersArr()[randomX].equals((field.getmLettersArr()[i]))) // determine position on field
+					{
+						if(randomX == j) // determine position on field
+						{
+							if(field.getmSquareArr()[i][j].equals(" -") || field.getmSquareArr()[i][j].equals("  -")) // check content of field
+							{
+								ChoosedOnField=true;
+							}
+						}
+					}
+				}
+			}
+		}
+		while(ChoosedOnField);
 		return computerChoice;
 	}
 
-	//Ask player ship coordinates
+	// ask player ship coordinates
 	public String scanPlayerShipCoordinate(Field square, Player player)
 	{
 		Scanner input = new Scanner(System.in);
@@ -375,14 +442,13 @@ public class Game {
 		return shipCoordinate;
 	}
 
-	//Ask player ship coordinates
+	// ask player ship coordinates
 	public String scanPlayerShootCoordinate(Field square, Player targetPlayer)
 	{
 		Scanner input = new Scanner(System.in);
 		String shipCoordinate=null;;
 		String shipDirection = null;
 		String[] letterArr = square.getmLettersArr();
-
 		boolean validInput=false;
 
 		do {
@@ -398,9 +464,9 @@ public class Game {
 					{
 						if(number<=square.getmSquareArr().length)
 						{
-							if(square.getmLettersArr().length>9)
+							if(square.getmSquareArr().length>9)
 							{
-								if(shipCoordinate.length()>2)
+								if(shipCoordinate.length()>3)
 								{
 									System.out.println("Invalid input, please enter only coordinate e.g A1");
 								}
@@ -411,7 +477,7 @@ public class Game {
 							}
 							else
 							{
-								if(shipCoordinate.length()>3)
+								if(shipCoordinate.length()>2)
 								{
 									System.out.println("Invalid input, please enter only coordinate e.g A1");
 								}

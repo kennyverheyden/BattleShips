@@ -38,7 +38,7 @@ public class Game {
 		while(human.getmPoints()>0 && computer.getmPoints()>0)
 		{
 			shoot(square,computer,scanPlayerShootCoordinate(square, computer));
-			shoot(square,human,computerShoot(square));
+			shoot(square,human,computerShoot(square, computer));
 			System.out.println("Your ships left: "+ human.getmPoints());
 			System.out.println("Computer ships left: "+computer.getmPoints());
 			square.printSquare();
@@ -46,7 +46,7 @@ public class Game {
 
 		if(human.getmPoints()>0)
 		{
-			System.out.println("You destroyed all the ships in the ocean");
+			System.out.println("You win, you destroyed all the ships in the ocean");
 		}
 		else
 		{
@@ -103,7 +103,6 @@ public class Game {
 			i=setCoordinate(square,player,shipCoordinate,i);
 		}
 	}
-
 
 	public int setCoordinate(Field square,Player player,String shipCoordinate, int i)
 	{
@@ -183,19 +182,19 @@ public class Game {
 			for (int humanJ = 0; humanJ < 3; humanJ++)
 			{
 				coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
-				for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
-					for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+				for (int iSquare = 0; iSquare < square.getmSquareMarkedArr().length; iSquare++) {
+					for (int  jSquare = 0; jSquare < square.getmSquareMarkedArr().length; jSquare++)
 					{
 						// compaire with fields on the square
 						if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman))
 						{
-							if(jSquare<10) // preserved space for formatting
+							if(jSquare<9) // preserved space for formatting
 							{
-								square.getmSquareArr()[iSquare][jSquare]="<>"; // formatting
+								square.getmSquareMarkedArr()[iSquare][jSquare]="<>"; // formatting
 							}
 							else
 							{
-								square.getmSquareArr()[iSquare][jSquare]=" <>"; // formatting
+								square.getmSquareMarkedArr()[iSquare][jSquare]=" <>"; // formatting
 							}
 						}
 					}
@@ -234,13 +233,13 @@ public class Game {
 										// compaire with fields on the square
 										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 										{
-											if(jSquare<10) // preserved space for formatting
+											if(jSquare<9) // preserved space for formatting
 											{
-												square.getmSquareArr()[iSquare][jSquare]=" @"; // formatting
+												square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
 											}
 											else
 											{
-												square.getmSquareArr()[iSquare][jSquare]="  @"; // formatting
+												square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 											}
 										}
 									}
@@ -306,13 +305,13 @@ public class Game {
 							{
 								if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
 								{
-									if(jSquare<=10)
+									if(jSquare<9)
 									{
-										square.getmSquareArr()[iSquare][jSquare]=" @"; // formatting
+										square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
 									}
 									else
 									{
-										square.getmSquareArr()[iSquare][jSquare]="  @"; // formatting
+										square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 									}
 								}
 							}
@@ -327,76 +326,91 @@ public class Game {
 			player.setmPoints();
 			if(!player.getmIdName().equals("computer"))
 			{
-				System.out.println("The computer took one of your ships to sink");
+				System.out.println("The computer took one of your ships to sink on field: "+ shipCoordinate);
 			}
 			else
 			{
-				System.out.println("You HIT a ship");
+				System.out.println("You HIT a ship on field: "+ shipCoordinate);
 			}
 		}
 		else
 		{
 			if(!player.getmIdName().equals("computer"))
 			{
-				System.out.println("The computer missed");
+				System.out.println("The computer missed on field: "+shipCoordinate);
 			}
 			else
 			{
-				System.out.println("You missed");
+				System.out.println("You missed on field: "+shipCoordinate);
 			}
-			if(!hit)
+
+			if(player.getmIdName().equals("computer"))
 			{
-				for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
-					for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+				for (int iSquare = 0; iSquare < square.getmSquareMarkedArr().length; iSquare++) {
+					for (int  jSquare = 0; jSquare < square.getmSquareMarkedArr().length; jSquare++)
 					{
 						if(square.getmSquareArr()[iSquare][jSquare].equals(shipCoordinate))
 						{
-							if(jSquare<=10)
+							if(jSquare<9)
 							{
-								square.getmSquareArr()[iSquare][jSquare]=" +"; // formatting
+								if(!square.getmSquareMarkedArr()[iSquare][jSquare].equals(" @"))
+									square.getmSquareMarkedArr()[iSquare][jSquare]=" +"; // formatting
 							}
 							else
 							{
-								square.getmSquareArr()[iSquare][jSquare]="  +"; // formatting
+								if(!square.getmSquareMarkedArr()[iSquare][jSquare].equals("  @"))
+									square.getmSquareMarkedArr()[iSquare][jSquare]="  +"; // formatting
 							}
 						}
 					}
 				}
 			}
 		}
-
 	}
-	public String computerShoot(Field field)
+
+	public String computerShoot(Field field, Player player)
 	{
-		boolean ChoosedOnField=false;
+		boolean takenField=false;
 		StringBuilder sb = new StringBuilder();
 		String computerChoice=null;
+		String listedField;
+		int randomX;
 		do
 		{
 			Random rn = new Random();
-			int randomX=rn.nextInt(field.getmSquareArr().length);
+			do {randomX=rn.nextInt(field.getmSquareArr().length);}while(randomX==0);
 			sb.append(field.getmLettersArr()[randomX]);
 			sb.append(randomX);
 			computerChoice=sb.toString();
-			// check if the field is already chosen or not
-			for(int i=0;i<field.getmSquareArr().length;i++)
-			{
-				for(int j=0;j<field.getmSquareArr().length;j++)
+			sb.setLength(0);
+			takenField=false;
+			// check if field is already taken by computer or not
+			for(int i=0;i<player.getmCoordinates().length;i++) {
+				for(int j=0;j<3;j++)
 				{
-					if(field.getmLettersArr()[randomX].equals((field.getmLettersArr()[i]))) // determine position on field
+					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
+					if(listedField.equals(computerChoice))
 					{
-						if(randomX == j) // determine position on field
+						takenField=true;
+					}
+				}
+			}
+			// check if the field is already destroyed or not
+			for(int i=0;i<field.getmSquareMarkedArr().length;i++)
+			{
+				for(int j=0;j<field.getmSquareMarkedArr().length;j++)
+				{
+					if(field.getmSquareArr().equals(computerChoice))
+					{
+						if(field.getmSquareMarkedArr()[i][j].equals(" @") || field.getmSquareMarkedArr()[i][j].equals("  @")) // check content of field
 						{
-							if(field.getmSquareArr()[i][j].equals(" -") || field.getmSquareArr()[i][j].equals("  -")) // check content of field
-							{
-								ChoosedOnField=true;
-							}
+							takenField=true;
 						}
 					}
 				}
 			}
 		}
-		while(ChoosedOnField);
+		while(takenField);
 		return computerChoice;
 	}
 
@@ -426,7 +440,6 @@ public class Game {
 					{
 						return shipCoordinate;
 					}
-
 				}
 				else
 				{

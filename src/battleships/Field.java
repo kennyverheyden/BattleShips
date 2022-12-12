@@ -3,10 +3,8 @@ package battleships;
 public class Field {
 
 	private String[][]mSquareArr;
-
+	private String[][]mSquareMarkedArr;
 	private String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
-
-
 	private int mSquareSize; // Define field size; defined by user input
 
 	public Field(int squareSize)
@@ -20,6 +18,7 @@ public class Field {
 
 		// Create field
 		mSquareArr = new String[squareSize][squareSize];
+		mSquareMarkedArr = new String[squareSize][squareSize];
 		StringBuilder sb = new StringBuilder();
 		for(int i=0;i<mSquareArr.length;i++)
 		{
@@ -27,6 +26,7 @@ public class Field {
 			{
 				sb.append(mLettersArr[i]+""+(j+1));
 				mSquareArr[i][j]=sb.toString();
+				mSquareMarkedArr[i][j]=sb.toString();
 				sb.setLength(0);
 			}
 		}
@@ -42,7 +42,7 @@ public class Field {
 			{
 				System.out.print("    ");
 			}
-		
+
 			if(i<9) {
 				System.out.print("-----");
 			}
@@ -50,7 +50,6 @@ public class Field {
 				System.out.print("------");
 			}
 		}
-
 	}
 
 	// Print the square (ocean) to the screen
@@ -61,38 +60,38 @@ public class Field {
 			if(number==0)				{
 				System.out.print("      ");
 			}
-				System.out.print(" ");
-				System.out.print(" "+(number+1)+"  ");
+			System.out.print(" ");
+			System.out.print(" "+(number+1)+"  ");
 		}
 
-			System.out.println();
-			for (int i = 0; i < mSquareArr.length; i++) {
+		System.out.println();
+		for (int i = 0; i < mSquareMarkedArr.length; i++) {
 
-				printFieldLineDivider();
-				System.out.println("");
-				for (int j = 0; j < mSquareSize; j++) {
-					if(j==0)
-					{
-						System.out.print("   ");
-						System.out.print(this.getmLettersArr()[i]+" | ");
-					}
-					System.out.print(mSquareArr[i][j]+" | ");
+			printFieldLineDivider();
+			System.out.println("");
+			for (int j = 0; j < mSquareSize; j++) {
+				if(j==0)
+				{
+					System.out.print("   ");
+					System.out.print(this.getmLettersArr()[i]+" | ");
 				}
-				System.out.println("");
+				System.out.print(mSquareMarkedArr[i][j]+" | ");
 			}
-			this.printFieldLineDivider();
-			System.out.println(" ");
+			System.out.println("");
 		}
-
-		public String[] getmLettersArr() {
-			return mLettersArr;
-		}
-
-		public String[][] getmSquareArr() {
-			return mSquareArr;
-		}
-
-		public void setmSquareArr(String[][] mSquareArr) {
-			this.mSquareArr = mSquareArr;
-		}
+		this.printFieldLineDivider();
+		System.out.println(" ");
 	}
+
+	public String[] getmLettersArr() {
+		return mLettersArr;
+	}
+
+	public String[][] getmSquareArr() {
+		return mSquareArr;
+	}
+
+	public String[][] getmSquareMarkedArr() {
+		return mSquareMarkedArr;
+	}
+}

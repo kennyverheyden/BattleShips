@@ -12,20 +12,20 @@ public class Player {
 		mPoints=maxShips;
 		mIdName=idName;
 	}
-	
+
 	public String getmIdName()
 	{
-	   return mIdName;
+		return mIdName;
 	}
 
 	public String getmCoordinates(int i, int j) {
 		return mCoordinates[i][j];
 	}
-	
+
 	public String[][] getmCoordinates() {
 		return mCoordinates;
 	}
-	
+
 	public void setmCoordinates(String mCoordinates, int i, int j) {
 		this.mCoordinates[i][j] = mCoordinates;
 	}
@@ -37,5 +37,5 @@ public class Player {
 	public void setmPoints() {
 		this.mPoints--;
 	}
-	
+
 }

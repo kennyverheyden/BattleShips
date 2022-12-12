@@ -400,7 +400,7 @@ public class Game {
 			{
 				for(int j=0;j<field.getmSquareMarkedArr().length;j++)
 				{
-					if(field.getmSquareArr().equals(computerChoice))
+					if(field.getmSquareArr()[i][j].equals(computerChoice))
 					{
 						if(field.getmSquareMarkedArr()[i][j].equals(" @") || field.getmSquareMarkedArr()[i][j].equals("  @")) // check content of field
 						{

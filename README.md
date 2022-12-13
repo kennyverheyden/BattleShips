@@ -10,7 +10,7 @@
 - Player shoots are marked on the field +
 - Destroyed ships are marked on the field @
 - Collisions with computer ships are marked after startposition @
-- Computer should not chose occupied fields with own ships
-- Computer should not chose fields with destroyed ships
+- Computer should not choose occupied fields with own ships
+- Computer should not choose fields with destroyed ships
 - Show field after each turn with amount of ships left for player and computer
 - When amount of ships is 0, the game is over

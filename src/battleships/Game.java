@@ -234,11 +234,11 @@ public class Game {
 										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 										{
 											if(jSquare<9) // preserved space for formatting
-											{
+											{  // mark field as hit
 												square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
 											}
 											else
-											{
+											{	// mark field as hit
 												square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 											}
 										}
@@ -306,11 +306,11 @@ public class Game {
 								if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
 								{
 									if(jSquare<9)
-									{
+									{	// mark field as hit
 										square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
 									}
 									else
-									{
+									{	// mark field as hit
 										square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 									}
 								}
@@ -352,12 +352,12 @@ public class Game {
 						if(square.getmSquareArr()[iSquare][jSquare].equals(shipCoordinate))
 						{
 							if(jSquare<9)
-							{
+							{	// mark hit
 								if(!square.getmSquareMarkedArr()[iSquare][jSquare].equals(" @"))
 									square.getmSquareMarkedArr()[iSquare][jSquare]=" +"; // formatting
 							}
 							else
-							{
+							{	// mark hit
 								if(!square.getmSquareMarkedArr()[iSquare][jSquare].equals("  @"))
 									square.getmSquareMarkedArr()[iSquare][jSquare]="  +"; // formatting
 							}
@@ -422,6 +422,7 @@ public class Game {
 		String shipDirection = null;
 		String[] letterArr = square.getmLettersArr();
 		boolean validInput=false;
+
 
 		do {
 			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" AND direction h=horizontal/v=vertical e.g. [A1h]:");

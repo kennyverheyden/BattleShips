@@ -2,8 +2,8 @@ package battleships;
 
 public class Field {
 
-	private String[][]mSquareArr;
-	private String[][]mSquareMarkedArr;
+	private String[][]mSquareArr; // Field, stores A1, A2, .
+	private String[][]mSquareMarkedArr; // Field marks (hits, shoots, ..)
 	private String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
 	private int mSquareSize; // Define field size; defined by user input
 
@@ -17,14 +17,14 @@ public class Field {
 		}
 
 		// Create field
-		mSquareArr = new String[squareSize][squareSize];
-		mSquareMarkedArr = new String[squareSize][squareSize];
-		StringBuilder sb = new StringBuilder();
+		mSquareArr = new String[squareSize][squareSize]; // Field // Field, stores A1, A2, .
+		mSquareMarkedArr = new String[squareSize][squareSize]; // Field marks (hits, shoots, ..)
+		StringBuilder sb = new StringBuilder(); // merge letters
 		for(int i=0;i<mSquareArr.length;i++)
 		{
 			for(int j=0;j<mSquareArr.length;j++)
 			{
-				sb.append(mLettersArr[i]+""+(j+1));
+				sb.append(mLettersArr[i]+""+(j+1)); // add letter coordinates to fields
 				mSquareArr[i][j]=sb.toString();
 				mSquareMarkedArr[i][j]=sb.toString();
 				sb.setLength(0);

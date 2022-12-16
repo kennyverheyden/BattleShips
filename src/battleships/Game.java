@@ -126,8 +126,8 @@ public class Game {
 			// we need to split up the String, to mark the other fields horizontal with dynamic number coordinate
 			for(int j=0;j<3;j++)
 			{
-				player.setmCoordinates(letter+coordinateNumber+direction, i, j);
-				player.setmCoordinatesDestroyed(letter+coordinateNumber+direction, i, j); // copy array for destroy markings
+				player.setmCoordinates(letter+coordinateNumber, i, j);
+				player.setmCoordinatesDestroyed(letter+coordinateNumber, i, j); // copy array for destroy markings
 				coordinateNumber++;
 			}
 		}
@@ -145,8 +145,8 @@ public class Game {
 			}
 			for(int j=0;j<3;j++)
 			{
-				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i, j);
-				player.setmCoordinatesDestroyed(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i, j);
+				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber, i, j);
+				player.setmCoordinatesDestroyed(square.getmLettersArr()[letterPosition]+coordinateNumber, i, j);
 				letterPosition++;
 			}
 		}
@@ -155,31 +155,98 @@ public class Game {
 
 	public boolean checkDuplicate(Player player, String shipCoordinate)
 	{
-		boolean duplicate=false;
-		String listedField;
-		String fieldCoordinate;
+		String letterCoordinate=null;
+		String fieldCoordinate = null;
+		String direction = null;
+		String secondFieldCoordinate = null;
+		String thirdFieldCoordinate=null;
+		int number=0;
 
-		for(int i=0;i<player.getmCoordinates().length;i++)
+		if(Character.isLetter(shipCoordinate.charAt(shipCoordinate.length()-1)))
 		{
-			for(int j=0;j<3;j++)
+			if(shipCoordinate.charAt(2)=='h' || shipCoordinate.charAt(2)=='v')
 			{
-				if(player.getmCoordinates()[i][j]!=null) // avoid error on first input while coordinate list is empty
+				letterCoordinate=String.valueOf(shipCoordinate.charAt(0)); // get letter coordinate
+				number=(Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
+				direction =String.valueOf(shipCoordinate.charAt(2));
+				fieldCoordinate=shipCoordinate.substring(0, shipCoordinate.length()-1); 
+			}
+			else if(shipCoordinate.charAt(3)=='h' || shipCoordinate.charAt(3)=='v')
+			{
+				letterCoordinate=String.valueOf(shipCoordinate.charAt(0)); // get letter coordinate
+				number=(Integer.parseInt((shipCoordinate.replaceAll("[^0-9]", "")))); //get coordinate number
+				direction =String.valueOf(shipCoordinate.charAt(3));
+				fieldCoordinate=shipCoordinate.substring(0, shipCoordinate.length()-1); 
+			}
+
+			if(direction.equals("h"))
+			{
+				secondFieldCoordinate= letterCoordinate+(number+1);
+				thirdFieldCoordinate= letterCoordinate+(number+2);
+			}
+			if(direction.equals("v"))
+			{
+				int i=0; // find letter index
+				while(i<Field.getmLettersArr().length)
 				{
-					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-					fieldCoordinate=shipCoordinate.substring(0, shipCoordinate.length()-1);
-					if(listedField.equals(fieldCoordinate))
+					if(Field.getmLettersArr()[i].equals(letterCoordinate))
 					{
-						duplicate=true;
+						break;
+					}
+					i++;
+				}
+				secondFieldCoordinate= Field.getmLettersArr()[i+1]+number;
+				thirdFieldCoordinate= Field.getmLettersArr()[i+2]+number;
+			}
+
+			if(direction.equals("h") || direction.equals("v"))
+			{
+				for(int i=0;i<player.getmCoordinates().length;i++)
+				{
+					for(int j=0;j<3;j++)
+					{
+						if(player.getmCoordinates()[i][j]!=null) // avoid error on first input while coordinate list is empty
+						{
+							if(player.getmCoordinates()[i][j].equals(fieldCoordinate))
+							{
+								return true;
+							}
+							if(player.getmCoordinates()[i][j].equals(secondFieldCoordinate))
+							{
+								return true;
+							}
+							if(player.getmCoordinates()[i][j].equals(thirdFieldCoordinate))
+							{
+								return true;
+							}
+						}
 					}
 				}
 			}
 		}
-		return duplicate;
+		else
+		{
+			fieldCoordinate=shipCoordinate;
+			for(int i=0;i<player.getmCoordinates().length;i++)
+			{
+				for(int j=0;j<3;j++)
+				{
+					if(player.getmCoordinates()[i][j]!=null) // avoid error on first input while coordinate list is empty
+					{
+						if(player.getmCoordinates()[i][j].equals(fieldCoordinate))
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public void updateSquareStart(Field square, Player human, Player computer)
 	{
-		String coordinateHuman; // for storing coordinate without the h or v in the String for processing
+		String coordinateHuman;
 		String coordinateComputer;
 
 
@@ -187,7 +254,7 @@ public class Game {
 		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
 			for (int humanJ = 0; humanJ < 3; humanJ++)
 			{
-				coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
+				coordinateHuman=human.getmCoordinates()[humanI][humanJ];
 				for (int iSquare = 0; iSquare < square.getmSquareMarkedArr().length; iSquare++) {
 					for (int  jSquare = 0; jSquare < square.getmSquareMarkedArr().length; jSquare++)
 					{
@@ -215,16 +282,15 @@ public class Game {
 				for(int computerI=0;computerI<computer.getmCoordinates().length;computerI++) {
 					for(int computerJ=0;computerJ<3;computerJ++)
 					{
-						// remove the h or the v from the coordinate for processing
-						coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
-						coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
+						coordinateHuman=human.getmCoordinates()[humanI][humanJ];
+						coordinateComputer=computer.getmCoordinates()[computerI][computerJ];
 
 						// ships on same field (collision)
 						if(coordinateHuman.equals(coordinateComputer))
 						{
-							// get coordinate without h or v in the string for compairing in field square
-							coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
-							coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
+							// get coordinate for comparing in field square
+							coordinateHuman=human.getmCoordinates()[humanI][humanJ];
+							coordinateComputer=computer.getmCoordinates()[computerI][computerJ];
 
 							human.getmCoordinatesDestroyed()[humanI][humanJ]="@";
 							computer.getmCoordinatesDestroyed()[computerI][computerJ]="@";
@@ -252,32 +318,26 @@ public class Game {
 				}
 			}
 		}
-
 		// count hitted fields human
 		checkFullShipHit(human);
 		// count hitted fields computer
 		checkFullShipHit(computer);
-
 	}
 
 	public void shoot(Field square, Player player, String shipCoordinate)
 	{
-		String coordinate;
-		String listedField; // temp storage from player coordinates array
 		boolean hit=false;
 
 		for(int i=0;i<player.getmCoordinates().length;i++)
 		{
 			for (int j = 0; j < 3; j++) {
-				coordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-				if(coordinate.equals(shipCoordinate)) {
+				if(player.getmCoordinates()[i][j].equals(shipCoordinate)) {
 					hit=true;
-					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
 					player.getmCoordinatesDestroyed()[i][j]="@"; // mark hit on playerCoordinateList
 					for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
 						for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
 						{
-							if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
+							if(square.getmSquareArr()[iSquare][jSquare].equals(player.getmCoordinates()[i][j]))
 							{
 								if(jSquare<9)
 								{	// mark field as hit
@@ -364,8 +424,7 @@ public class Game {
 		{
 			for(int j=0;j<3;j++)
 			{
-				String subCoordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-				if(subCoordinate.equals(shipCoordinate)) // field exist, then check from the first field
+				if(player.getmCoordinates()[i][j].equals(shipCoordinate)) // field exist, then check from the first field
 				{
 					for(int x=0;x<3;x++)
 					{
@@ -411,28 +470,24 @@ public class Game {
 		boolean takenField=false;
 		StringBuilder sb = new StringBuilder();
 		String computerChoice=null;
-		String listedField;
 		int randomX;
 		do
 		{
 			Random rn = new Random();
 			do {randomX=rn.nextInt(field.getmSquareArr().length);}while(randomX==0);
 			sb.append(field.getmLettersArr()[randomX]);
+			do {randomX=rn.nextInt(field.getmSquareArr().length);}while(randomX==0);
 			sb.append(randomX);
 			computerChoice=sb.toString();
 			sb.setLength(0);
 			takenField=false;
+
 			// check if field is already taken by computer or not
-			for(int i=0;i<player.getmCoordinates().length;i++) {
-				for(int j=0;j<3;j++)
-				{
-					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
-					if(listedField.equals(computerChoice))
-					{
-						takenField=true;
-					}
-				}
+			if(checkDuplicate(player,computerChoice))
+			{
+				takenField=true;
 			}
+
 			// check if the field is already destroyed or not
 			for(int i=0;i<field.getmSquareMarkedArr().length;i++)
 			{
@@ -472,7 +527,7 @@ public class Game {
 				{
 					if(checkDuplicate(player,shipCoordinate))
 					{
-						System.out.println("Coordinate already used");
+						System.out.println("Coordinate already used or in range with another ship");
 						validInput=false;
 					}
 					else

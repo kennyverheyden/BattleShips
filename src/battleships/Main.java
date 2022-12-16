@@ -63,7 +63,7 @@ public class Main {
 	private static void welcome() {
 		System.out.println("  *************************************************************************");
 		System.out.println("  *****                         Battle Ships                          *****");
-		System.out.println("  *****           Defeat the computer ships in the ocean             *****");
+		System.out.println("  *****           Defeat the computer ships in the ocean              *****");
 		System.out.println("  *************************************************************************\n");
 	}
 

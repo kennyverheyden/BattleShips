@@ -4,7 +4,7 @@ public class Field {
 
 	private String[][]mSquareArr; // Field, stores A1, A2, .
 	private String[][]mSquareMarkedArr; // Field marks (hits, shoots, ..)
-	private String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
+	private static String[] mLettersArr = new String[26]; // Alphabet list for field coordinates
 	private int mSquareSize; // Define field size; defined by user input
 
 	public Field(int squareSize)
@@ -83,7 +83,7 @@ public class Field {
 		System.out.println(" ");
 	}
 
-	public String[] getmLettersArr() {
+	public static String[] getmLettersArr() {
 		return mLettersArr;
 	}
 

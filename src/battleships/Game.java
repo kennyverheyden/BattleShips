@@ -1,5 +1,6 @@
 package battleships;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -27,6 +28,8 @@ public class Game {
 		setPlayerStartCoordinates(square,computer);
 		updateSquareStart(square, human, computer);
 		square.printSquare();
+		//		System.out.println(Arrays.deepToString(human.getmCoordinates()));
+		//		System.out.println(Arrays.deepToString(computer.getmCoordinates()));
 		System.out.println("Ships left player: "+human.getmPoints());
 		System.out.println("Ships left computer: "+computer.getmPoints());
 		play(square, human, computer);
@@ -124,6 +127,7 @@ public class Game {
 			for(int j=0;j<3;j++)
 			{
 				player.setmCoordinates(letter+coordinateNumber+direction, i, j);
+				player.setmCoordinatesDestroyed(letter+coordinateNumber+direction, i, j); // copy array for destroy markings
 				coordinateNumber++;
 			}
 		}
@@ -142,6 +146,7 @@ public class Game {
 			for(int j=0;j<3;j++)
 			{
 				player.setmCoordinates(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i, j);
+				player.setmCoordinatesDestroyed(square.getmLettersArr()[letterPosition]+coordinateNumber+direction, i, j);
 				letterPosition++;
 			}
 		}
@@ -176,6 +181,7 @@ public class Game {
 	{
 		String coordinateHuman; // for storing coordinate without the h or v in the String for processing
 		String coordinateComputer;
+
 
 		// mark ships on field
 		for (int humanI = 0; humanI < human.getmCoordinates().length; humanI++) {
@@ -216,31 +222,27 @@ public class Game {
 						// ships on same field (collision)
 						if(coordinateHuman.equals(coordinateComputer))
 						{
-							// now read the occupied fields of this ship from the player coordinate list
-							for (int x = 0; x < 3; x++) // read from the first field x of the ship
-							{
-								// get coordinate without h or v in the string for compairing in field square
-								coordinateHuman=human.getmCoordinates()[humanI][x].substring(0, human.getmCoordinates()[humanI][x].length()-1);
-								coordinateComputer=computer.getmCoordinates()[computerI][x].substring(0, computer.getmCoordinates()[computerI][x].length()-1);
+							// get coordinate without h or v in the string for compairing in field square
+							coordinateHuman=human.getmCoordinates()[humanI][humanJ].substring(0, human.getmCoordinates()[humanI][humanJ].length()-1);
+							coordinateComputer=computer.getmCoordinates()[computerI][computerJ].substring(0, computer.getmCoordinates()[computerI][computerJ].length()-1);
 
-								human.getmCoordinates()[humanI][x]="@";
-								computer.getmCoordinates()[computerI][x]="@";
+							human.getmCoordinatesDestroyed()[humanI][humanJ]="@";
+							computer.getmCoordinatesDestroyed()[computerI][computerJ]="@";
 
-								// mark on field, the listed coordinates from this ship
-								for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
-									for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+							// mark on field, the listed coordinates from this ship
+							for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+								for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+								{
+									// compaire with fields on the square
+									if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
 									{
-										// compaire with fields on the square
-										if(square.getmSquareArr()[iSquare][jSquare].equals(coordinateHuman) || square.getmSquareArr()[iSquare][jSquare].equals(coordinateComputer))
-										{
-											if(jSquare<9) // preserved space for formatting
-											{  // mark field as hit
-												square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
-											}
-											else
-											{	// mark field as hit
-												square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
-											}
+										if(jSquare<9) // preserved space for formatting
+										{  // mark field as hit
+											square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
+										}
+										else
+										{	// mark field as hit
+											square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 										}
 									}
 								}
@@ -252,35 +254,10 @@ public class Game {
 		}
 
 		// count hitted fields human
-		for(int i=0; i<human.getmCoordinates().length;i++)
-		{
-			int count=0;
-			for (int j=0; j<3; j++) {
-				if(human.getmCoordinates()[i][j].equals("@"))
-				{
-					count++;
-					if(count==3)
-					{
-						human.setmPoints();
-					}
-				}
-			}
-		}
+		checkFullShipHit(human);
 		// count hitted fields computer
-		for(int i=0; i<computer.getmCoordinates().length;i++)
-		{
-			int count=0;
-			for (int j=0; j<3; j++) {
-				if(human.getmCoordinates()[i][j].equals("@"))
-				{
-					count++;
-					if(count==3)
-					{
-						computer.setmPoints();
-					}
-				}
-			}
-		}
+		checkFullShipHit(computer);
+
 	}
 
 	public void shoot(Field square, Player player, String shipCoordinate)
@@ -295,24 +272,20 @@ public class Game {
 				coordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
 				if(coordinate.equals(shipCoordinate)) {
 					hit=true;
-
-					for(int x=0;x<3;x++)
-					{
-						listedField=player.getmCoordinates()[i][x].substring(0, player.getmCoordinates()[i][x].length()-1);
-						player.getmCoordinates()[i][x]="@";
-						for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
-							for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+					listedField=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
+					player.getmCoordinatesDestroyed()[i][j]="@"; // mark hit on playerCoordinateList
+					for (int iSquare = 0; iSquare < square.getmSquareArr().length; iSquare++) {
+						for (int  jSquare = 0; jSquare < square.getmSquareArr().length; jSquare++)
+						{
+							if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
 							{
-								if(square.getmSquareArr()[iSquare][jSquare].equals(listedField))
-								{
-									if(jSquare<9)
-									{	// mark field as hit
-										square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
-									}
-									else
-									{	// mark field as hit
-										square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
-									}
+								if(jSquare<9)
+								{	// mark field as hit
+									square.getmSquareMarkedArr()[iSquare][jSquare]=" @"; // formatting
+								}
+								else
+								{	// mark field as hit
+									square.getmSquareMarkedArr()[iSquare][jSquare]="  @"; // formatting
 								}
 							}
 						}
@@ -321,16 +294,32 @@ public class Game {
 			}
 		}	
 
+		// Ship amount processing
+		boolean fullHit=false;
 		if(hit)
 		{
-			player.setmPoints();
+			if(checkFullShipHit(player, shipCoordinate))
+			{
+				player.setmPoints();
+				fullHit=true;
+				if(!player.getmIdName().equals("computer"))
+				{
+					System.out.println("One of your ships sank");
+				}
+				else
+				{
+					System.out.println("A ship of the computer sank");
+				}
+			}
 			if(!player.getmIdName().equals("computer"))
 			{
-				System.out.println("The computer took one of your ships to sink on field: "+ shipCoordinate);
+				if(!fullHit)
+					System.out.println("The computer hit your ship on: "+ shipCoordinate);
 			}
 			else
 			{
-				System.out.println("You HIT a ship on field: "+ shipCoordinate);
+				if(!fullHit)
+					System.out.println("You HIT a ship on field: "+ shipCoordinate);
 			}
 		}
 		else
@@ -363,6 +352,55 @@ public class Game {
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	private boolean checkFullShipHit(Player player, String shipCoordinate) {
+		int shipFields=0;
+
+		for(int i=0;i<player.getmCoordinates().length;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				String subCoordinate=player.getmCoordinates()[i][j].substring(0, player.getmCoordinates()[i][j].length()-1);
+				if(subCoordinate.equals(shipCoordinate)) // field exist, then check from the first field
+				{
+					for(int x=0;x<3;x++)
+					{
+						if(player.getmCoordinatesDestroyed()[i][x].equals("@"))
+						{
+							shipFields++;
+						}
+					}
+				}
+			}
+		}
+		if(shipFields==3)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	private void checkFullShipHit(Player player) {
+
+		for(int i=0;i<player.getmCoordinates().length;i++)
+		{
+			int shipFields=0;
+			for(int j=0;j<3;j++)
+			{
+				if(player.getmCoordinatesDestroyed()[i][j].equals("@"))
+				{
+					shipFields++;
+				}
+				if(shipFields==3)
+				{
+					player.setmPoints();
 				}
 			}
 		}

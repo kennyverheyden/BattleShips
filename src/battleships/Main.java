@@ -1,9 +1,7 @@
-
 // Kenny Verheyden
 // https://kennyverheyden.be
 
 package battleships;
-
 import java.util.Scanner;
 
 import battleships.Game;

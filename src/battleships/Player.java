@@ -11,7 +11,6 @@ public class Player {
 
 	private String mIdName;
 	private int mPoints;
-	private static ArrayList<String> computerMemory = new ArrayList<String>();
 
 	public Player(int maxShips, String idName)
 	{
@@ -56,17 +55,6 @@ public class Player {
 
 	public void setmCoordinatesDestroyed(String[][] mCoordinatesDestroyed) {
 		this.mCoordinatesDestroyed = mCoordinatesDestroyed;
-	}
-
-	public static ArrayList<String> getComputerMemory() {
-		return computerMemory;
-	}
-
-	static boolean hasDuplicateComputerMemory(String coordinate) {
-		for (String item : computerMemory) {
-			if (computerMemory.contains(coordinate)) return true;
-		}
-		return false;
 	}
 
 }

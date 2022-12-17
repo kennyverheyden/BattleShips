@@ -27,8 +27,6 @@ public class Game {
 		setPlayerStartCoordinates(square,computer);
 		updateSquareStart(square, human, computer);
 		square.printSquare();
-		//		System.out.println(Arrays.deepToString(human.getmCoordinates()));
-		//		System.out.println(Arrays.deepToString(computer.getmCoordinates()));
 		System.out.println("Ships left player: "+human.getmPoints());
 		System.out.println("Ships left computer: "+computer.getmPoints());
 		play(square, human, computer);
@@ -503,7 +501,6 @@ public class Game {
 					{
 						if(human.getmCoordinatesDestroyed()[i][j].equals("@"))
 						{
-
 							for(int x=0;x<3;x++)
 							{
 								if(!human.getmCoordinatesDestroyed()[i][x].equals("@"))
@@ -520,14 +517,6 @@ public class Game {
 			if(checkDuplicate(computer,computerChoice)) // check for own placed ships
 			{
 				takenField=true;
-			}
-			if(Player.hasDuplicateComputerMemory(computerChoice)) // memory shooted fields
-			{
-				takenField=true;
-			}
-			else
-			{
-				Player.getComputerMemory().add(computerChoice);
 			}
 
 			// check if the field is already destroyed or not
@@ -546,7 +535,6 @@ public class Game {
 			}
 		}
 		while(takenField);
-
 		return computerChoice;
 	}
 

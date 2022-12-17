@@ -1,14 +1,17 @@
 package battleships;
 
+import java.util.ArrayList;
+
 public class Player {
 
 	private String[][] mCoordinates; // stores the player ships coordinate, multi array [4][3] 4 ships of 3 fields
 
 	// mark destroyed ships @, we need this apart for counting points and uses the original array as index for searching with original shipCoordinate
-	private String[][] mCoordinatesDestroyed; 
+	private String[][] mCoordinatesDestroyed;
 
 	private String mIdName;
 	private int mPoints;
+	private static ArrayList<String> computerMemory = new ArrayList<String>();
 
 	public Player(int maxShips, String idName)
 	{
@@ -55,6 +58,15 @@ public class Player {
 		this.mCoordinatesDestroyed = mCoordinatesDestroyed;
 	}
 
+	public static ArrayList<String> getComputerMemory() {
+		return computerMemory;
+	}
 
+	static boolean hasDuplicateComputerMemory(String coordinate) {
+		for (String item : computerMemory) {
+			if (computerMemory.contains(coordinate)) return true;
+		}
+		return false;
+	}
 
 }

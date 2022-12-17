@@ -1,6 +1,5 @@
 package battleships;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -41,7 +40,7 @@ public class Game {
 		while(human.getmPoints()>0 && computer.getmPoints()>0)
 		{
 			shoot(square,computer,scanPlayerShootCoordinate(square, computer));
-			shoot(square,human,computerShoot(square, computer));
+			shoot(square,human,computerShoot(square, computer, human));
 			System.out.println("Your ships left: "+ human.getmPoints());
 			System.out.println("Computer ships left: "+computer.getmPoints());
 			square.printSquare();
@@ -465,27 +464,70 @@ public class Game {
 		}
 	}
 
-	public String computerShoot(Field field, Player player)
+	public String computerShoot(Field field, Player computer, Player human)
 	{
-		boolean takenField=false;
 		StringBuilder sb = new StringBuilder();
 		String computerChoice=null;
-		int randomX;
+		boolean takenField;
 		do
 		{
+			int randomX;
 			Random rn = new Random();
 			do {randomX=rn.nextInt(field.getmSquareArr().length);}while(randomX==0);
 			sb.append(field.getmLettersArr()[randomX]);
 			do {randomX=rn.nextInt(field.getmSquareArr().length);}while(randomX==0);
+			takenField=false;	
 			sb.append(randomX);
 			computerChoice=sb.toString();
 			sb.setLength(0);
-			takenField=false;
+
+			//as human do, if the computer see a hit @, he will take the field next to it
+			//do not in start position or initialization, so check the coordinate list for empty values
+			boolean initStatus=false;
+			for (int i = 0; i < computer.getmCoordinates().length; i++) {
+				for (int j = 0; j < 3; j++) {
+					if(computer.getmCoordinates()[i][j]==null)
+					{
+						initStatus=true;
+					}
+					else
+					{
+						initStatus=false;
+					}
+				}
+			}
+			if(!initStatus)
+			{
+				for (int i = 0; i < human.getmCoordinates().length; i++) {
+					for(int j=0; j<3;j++)
+					{
+						if(human.getmCoordinatesDestroyed()[i][j].equals("@"))
+						{
+
+							for(int x=0;x<3;x++)
+							{
+								if(!human.getmCoordinatesDestroyed()[i][x].equals("@"))
+								{
+									computerChoice=human.getmCoordinatesDestroyed()[i][x];
+								}
+							}
+						}
+					}
+				}
+			}
 
 			// check if field is already taken by computer or not
-			if(checkDuplicate(player,computerChoice))
+			if(checkDuplicate(computer,computerChoice)) // check for own placed ships
 			{
 				takenField=true;
+			}
+			if(Player.hasDuplicateComputerMemory(computerChoice)) // memory shooted fields
+			{
+				takenField=true;
+			}
+			else
+			{
+				Player.getComputerMemory().add(computerChoice);
 			}
 
 			// check if the field is already destroyed or not
@@ -504,6 +546,7 @@ public class Game {
 			}
 		}
 		while(takenField);
+
 		return computerChoice;
 	}
 
@@ -515,7 +558,6 @@ public class Game {
 		String shipDirection = null;
 		String[] letterArr = square.getmLettersArr();
 		boolean validInput=false;
-
 
 		do {
 			System.out.println("Enter coordinate between A1 and "+(letterArr[square.getmSquareArr().length-1]).toUpperCase()+""+square.getmSquareArr().length +" AND direction h=horizontal/v=vertical e.g. [A1h]:");

@@ -3,7 +3,7 @@
 
 - Dynamic board
 - 3 field ship
-- Each player has 4 ships
+- Player and computer have 4 ships
 - Ships can be positioned horizontally or vertically on start position
 - Input validation and check for "out of field"
 - Player ships are marked on the field <>

@@ -14,3 +14,5 @@
 - Computer should not choose fields with destroyed ships
 - Show field after each turn with amount of ships left for player and computer
 - When amount of ships is 0, the game is over
+
+![battleships](https://user-images.githubusercontent.com/54863392/214706739-60b3841a-7f48-4fef-9290-09382e110520.png)

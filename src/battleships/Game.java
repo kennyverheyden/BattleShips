@@ -651,6 +651,11 @@ public class Game {
 		int i=0;
 		boolean check=false;
 		number=(Integer.parseInt((input.replaceAll("[^0-9]", "")))); //get coordinate number
+		if(number <=0)
+		{
+			System.out.println("Enter a valid number");
+			return check;
+		}
 		if(number<10) {
 			direction =String.valueOf(input.charAt(2)); // get direction
 		}else {
